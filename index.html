@@ -5,28 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบลงเวลา อบต.ตะงาว</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
         :root { --primary: #004aad; --success: #28a745; --danger: #dc3545; }
         body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .container { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; transition: 0.8s; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; transition: 0.5s; }
         .hidden { display: none !important; }
         .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
         .btn-in { background: var(--success); }
         .btn-out { background: var(--primary); }
-        .btn-disabled { background: #ccc !important; cursor: not-allowed; }
         input { width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd; border-radius: 10px; text-align: center; font-size: 18px; box-sizing: border-box; }
         .info { margin-bottom: 15px; padding: 15px; background: #eef2f7; border-radius: 10px; }
         #displayTime { font-size: 28px; font-weight: bold; color: var(--primary); display: block; }
-        .error-text { color: var(--danger); font-weight: bold; margin: 10px 0; }
+        
+        /* สไตล์หน้ากล้องสแกน */
+        #scanner-container { width: 100%; height: 250px; background: #000; border-radius: 15px; overflow: hidden; position: relative; margin-top: 10px; }
+        #canvas { width: 100%; height: 100%; object-fit: cover; }
+        #scanStatus { margin-top: 10px; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
-        <div style="width:100px; height:100px; background:#eee; border-radius:50%; border:3px solid var(--primary); display:flex; justify-content:center; align-items:center; margin-bottom:20px;">โลโก้</div>
+        <div style="width:100px; height:100px; background:#eee; border-radius:50%; border:3px solid var(--primary); display:flex; justify-content:center; align-items:center; margin-bottom:20px;">
+            <span style="color:var(--primary); font-weight:bold;">อบต.</span>
+        </div>
         <h2>อบต.ตะงาว</h2>
-        <p>ระบบบันทึกเวลาปฏิบัติราชการ</p>
+        <p>กำลังเตรียมระบบสแกน...</p>
     </div>
 
     <div class="container">
@@ -38,75 +44,96 @@
 
         <div id="main-page" class="hidden">
             <div class="info">
-                <p id="checkStatus" class="error-text hidden">⚠️ กรุณาสแกน QR Code ที่บอร์ดเท่านั้น</p>
                 <p>สวัสดี: <span id="displayName" style="font-weight:bold;">...</span></p>
                 <span id="displayTime">00:00:00</span>
             </div>
-            <button id="btnIn" class="btn btn-in" onclick="saveData('IN')">เข้างาน (ก่อน 08:30)</button>
-            <button id="btnOut" class="btn btn-out" onclick="saveData('OUT')">ออกงาน (หลัง 16:30)</button>
+            <button class="btn btn-in" onclick="startScanner('IN')">สแกน QR เพื่อเข้างาน</button>
+            <button class="btn btn-out" onclick="startScanner('OUT')">สแกน QR เพื่อออกงาน</button>
+        </div>
+
+        <div id="scanner-page" class="hidden">
+            <h3>กรุณาส่องไปที่ QR Code</h3>
+            <div id="scanner-container">
+                <canvas id="canvas"></canvas>
+            </div>
+            <p id="scanStatus">กำลังเปิดกล้อง...</p>
+            <button class="btn btn-out" style="background:#666" onclick="location.reload()">ยกเลิก</button>
         </div>
     </div>
 
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_Gq2Cl2_XU8T4YumgEZiPl4zsdLuyv58PlZeeFWrrXXg0T1ODnSyRBskdEFDu9aok/exec";
-        let currentId = "";
+        const QR_SECRET = "อบต.ตะงาว"; // รหัสลับใน QR Code ที่บอร์ด
+        let currentId = "", currentType = "", video = document.createElement("video"), scanning = false;
 
         window.onload = () => {
             setTimeout(() => { document.getElementById('splash-screen').classList.add('hidden'); }, 2000);
             setInterval(() => { 
-                const now = new Date();
-                document.getElementById('displayTime').innerText = now.toLocaleTimeString('th-TH');
+                document.getElementById('displayTime').innerText = new Date().toLocaleTimeString('th-TH');
             }, 1000);
         };
 
         function login() {
-            currentId = document.getElementById('empId').value.trim();
-            if(!currentId) return alert("กรุณากรอกรหัสประจำตัวครับ");
-            
+            const inputId = document.getElementById('empId').value.trim();
+            if(!inputId) return alert("กรุณากรอกรหัส");
+            currentId = inputId;
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('main-page').classList.remove('hidden');
-
+            
             fetch(WEB_APP_URL + "?id=" + encodeURIComponent(currentId) + "&type=CHECK_NAME")
-            .then(res => res.text())
-            .then(name => {
+            .then(res => res.text()).then(name => {
                 document.getElementById('displayName').innerText = "รหัส " + currentId + " " + name;
-                checkQRCode(); // ตรวจสอบรหัสลับจาก URL
             });
         }
 
-        function checkQRCode() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const qrCheck = urlParams.get('check');
-            const btnIn = document.getElementById('btnIn');
-            const btnOut = document.getElementById('btnOut');
-            const statusText = document.getElementById('checkStatus');
-
-            if (qrCheck !== "dong") { // ถ้าไม่ได้สแกนมาจาก QR (ไม่มี ?check=dong)
-                btnIn.disabled = true;
-                btnOut.disabled = true;
-                btnIn.classList.add('btn-disabled');
-                btnOut.classList.add('btn-disabled');
-                statusText.classList.remove('hidden');
-            }
+        function startScanner(type) {
+            currentType = type;
+            document.getElementById('main-page').classList.add('hidden');
+            document.getElementById('scanner-page').classList.remove('hidden');
+            
+            // เปิดกล้องมือถือ
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true);
+                video.play();
+                scanning = true;
+                requestAnimationFrame(tick);
+            }).catch(err => {
+                alert("เข้าถึงกล้องไม่ได้: " + err);
+                location.reload();
+            });
         }
 
-        function saveData(type) {
-            const btnIn = document.getElementById('btnIn');
-            const btnOut = document.getElementById('btnOut');
-            
-            btnIn.disabled = true; 
-            btnOut.disabled = true;
-            btnIn.innerText = "กำลังบันทึก...";
-            btnOut.innerText = "กำลังบันทึก...";
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA && scanning) {
+                const canvasElement = document.getElementById("canvas");
+                const canvas = canvasElement.getContext("2d");
+                canvasElement.height = video.videoHeight;
+                canvasElement.width = video.videoWidth;
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                
+                const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
 
-            fetch(WEB_APP_URL + "?id=" + encodeURIComponent(currentId) + "&type=" + type)
-            .then(res => res.text())
-            .then(data => {
+                if (code) {
+                    if (code.data === QR_SECRET) {
+                        scanning = false;
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                        document.getElementById('scanStatus').innerText = "สแกนสำเร็จ! กำลังบันทึก...";
+                        sendData();
+                    } else {
+                        document.getElementById('scanStatus').innerText = "QR ไม่ถูกต้อง กรุณาลองใหม่";
+                        document.getElementById('scanStatus').style.color = "red";
+                    }
+                }
+            }
+            if(scanning) requestAnimationFrame(tick);
+        }
+
+        function sendData() {
+            fetch(WEB_APP_URL + "?id=" + encodeURIComponent(currentId) + "&type=" + currentType)
+            .then(res => res.text()).then(data => {
                 alert(data);
-                location.reload();
-            })
-            .catch(err => {
-                alert("บันทึกไม่สำเร็จ: " + err);
                 location.reload();
             });
         }
