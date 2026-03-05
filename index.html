@@ -7,53 +7,151 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
-        :root { --primary: #004aad; --success: #28a745; --danger: #dc3545; }
-        body { font-family: 'Sarabun', sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
-        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; transition: 0.5s; }
+        :root { --primary: #004aad; --success: #2ecc71; --danger: #e74c3c; --bg: #f0f2f5; }
+        
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background: var(--bg); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            width: 100%;
+            max-width: 380px; 
+            text-align: center;
+            box-sizing: border-box; 
+        }
+        
+        #splash-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 1000; transition: 0.5s; 
+        }
+
         .hidden { display: none !important; }
-        .btn { width: 100%; padding: 15px; margin: 10px 0; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
+
+        input { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 15px 0; 
+            border: 2px solid #ddd; 
+            border-radius: 15px; 
+            text-align: center; 
+            font-size: 20px; 
+            outline: none; 
+            box-sizing: border-box;
+        }
+
+        .btn-main { 
+            width: 100%; 
+            padding: 18px; 
+            margin: 10px 0; 
+            border: none; 
+            border-radius: 20px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: 0.2s;
+        }
+
+        .btn-main:active { transform: scale(0.98); }
+        .btn-login { background: var(--primary); }
         .btn-in { background: var(--success); }
-        .btn-out { background: var(--primary); }
-        input { width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd; border-radius: 10px; text-align: center; font-size: 18px; box-sizing: border-box; }
-        .info { margin-bottom: 15px; padding: 15px; background: #eef2f7; border-radius: 10px; }
-        #displayTime { font-size: 28px; font-weight: bold; color: var(--primary); display: block; }
-        .pos-text { color: #666; font-size: 16px; margin-top: 5px; display: block; }
-        #scanner-container { width: 100%; height: 250px; background: #000; border-radius: 15px; overflow: hidden; position: relative; margin-top: 10px; }
-        #canvas { width: 100%; height: 100%; object-fit: cover; }
-        #timer-text { color: red; font-weight: bold; font-size: 20px; }
+        .btn-out { background: #34495e; }
+
+        /* ปุ่มย้อนกลับแบบเล็กๆ */
+        .btn-back {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 15px;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 5px;
+        }
+
+        .info-box { 
+            background: #f8fafc; 
+            padding: 20px; 
+            border-radius: 20px; 
+            margin-bottom: 20px; 
+            border: 1px solid #e2e8f0;
+            box-sizing: border-box;
+        }
+
+        .pos-text { color: #64748b; font-size: 16px; display: block; margin-top: 5px; }
+        #displayTime { font-size: 28px; font-weight: bold; color: var(--primary); display: block; margin-top: 10px; }
+        
+        #scanner-container { 
+            width: 100%; 
+            height: 250px; 
+            background: #000; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            margin: 15px auto;
+            border: 4px solid white;
+            box-sizing: border-box;
+        }
+
+        #timer-text { color: var(--danger); font-weight: bold; font-size: 22px; }
     </style>
 </head>
 <body>
     <div id="splash-screen">
-        <h2>อบต.ดงตะงาว</h2>
-        <p>กำลังเตรียมระบบบันทึกเวลา...</p>
+        <h2 style="color: var(--primary); margin-bottom: 5px;">อบต.ดงตะงาว</h2>
+        <p>ระบบบันทึกเวลาเข้างาน/ออกงาน</p>
     </div>
 
     <div class="container">
         <div id="login-page">
-            <h3>กรอกรหัสประจำตัว</h3>
-            <input type="text" id="empId" placeholder="ตัวอย่าง: พต01">
-            <button class="btn btn-out" onclick="login()">ยืนยันรายชื่อ</button>
+            <h3 style="margin-top:0;">ยินดีต้อนรับ</h3>
+            <p style="color:#666;">กรุณากรอกรหัสประจำตัวเพื่อเริ่มต้น</p>
+            <input type="text" id="empId" placeholder="เช่น ป01">
+            <button class="btn-main btn-login" onclick="login()">เข้าสู่ระบบ</button>
         </div>
 
         <div id="main-page" class="hidden">
-            <div class="info">
-                <p style="margin:0;">สวัสดี: <span id="displayName" style="font-weight:bold;">...</span></p>
+            <div class="info-box">
+                <span id="displayName" style="font-weight:bold; font-size: 20px;">รหัส: ...</span>
                 <span id="displayPos" class="pos-text">ตำแหน่ง: ...</span>
                 <span id="displayTime">00:00:00</span>
             </div>
-            <button class="btn btn-in" onclick="startScanner('IN')">สแกน QR เพื่อเข้างาน</button>
-            <button class="btn btn-out" onclick="startScanner('OUT')">สแกน QR เพื่อออกงาน</button>
+            
+            <button class="btn-main btn-in" onclick="startScanner('IN')">
+                <span>📍 บันทึกเข้างาน</span>
+            </button>
+            <button class="btn-main btn-out" onclick="startScanner('OUT')">
+                <span>🏠 บันทึกออกงาน</span>
+            </button>
+
+            <button class="btn-back" onclick="location.reload()">ย้อนกลับ</button>
         </div>
 
         <div id="scanner-page" class="hidden">
-            <h3>กรุณาสแกนภายใน <span id="timer-text">10</span> วินาที</h3>
+            <h3>สแกนภายใน <span id="timer-text">10</span> วิ</h3>
             <div id="scanner-container">
                 <canvas id="canvas"></canvas>
             </div>
-            <p id="scanStatus">กำลังอ่าน QR Code...</p>
-            <button class="btn btn-out" style="background:#666" onclick="stopScanner()">ยกเลิก</button>
+            <p id="scanStatus" style="margin-top:15px; color:#666;">กำลังรอ QR Code...</p>
+            <button class="btn-main" style="background:#94a3b8; padding:12px; font-size:16px;" onclick="location.reload()">ยกเลิก</button>
         </div>
     </div>
 
@@ -62,7 +160,7 @@
         const QR_SECRET = "อบต.ดงตะงาว"; 
         const targetLat = 14.610752; 
         const targetLng = 100.581508; 
-        const maxDistance = 30; // ปรับเป็น 30 เมตรให้สแกนติดง่ายขึ้นครับ
+        const maxDistance = 15; // ปรับเป็น 30 เมตรตามที่เคยแนะนำครับ
 
         let currentId = "", currentType = "", video = document.createElement("video"), scanning = false;
         let countdown;
@@ -97,7 +195,7 @@
             countdown = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timer-text').innerText = timeLeft;
-                if(timeLeft <= 0) { stopScanner(); alert("หมดเวลาสแกนครับ"); }
+                if(timeLeft <= 0) { clearInterval(countdown); alert("หมดเวลาสแกนครับ"); location.reload(); }
             }, 1000);
 
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
@@ -107,13 +205,6 @@
                 scanning = true;
                 requestAnimationFrame(tick);
             });
-        }
-
-        function stopScanner() {
-            clearInterval(countdown);
-            scanning = false;
-            if(video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
-            location.reload(); 
         }
 
         function tick() {
