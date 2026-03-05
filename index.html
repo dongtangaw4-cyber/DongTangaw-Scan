@@ -33,7 +33,7 @@
     <div class="container">
         <div id="login-page">
             <h3>กรอกรหัสประจำตัว</h3>
-            <input type="text" id="empId" placeholder="ตัวอย่าง: ป01">
+            <input type="text" id="empId" placeholder="ตัวอย่าง: พต01">
             <button class="btn btn-out" onclick="login()">ยืนยันรายชื่อ</button>
         </div>
 
@@ -43,8 +43,8 @@
                 <span id="displayPos" class="pos-text">ตำแหน่ง: ...</span>
                 <span id="displayTime">00:00:00</span>
             </div>
-            <button class="btn btn-in" onclick="startScanner('IN')">สแกน QR เพื่อเข้างาน (ก่อน 8.30 น.)</button>
-            <button class="btn btn-out" onclick="startScanner('OUT')">สแกน QR เพื่อออกงาน (ตั้งแต่ 16.30 น.)</button>
+            <button class="btn btn-in" onclick="startScanner('IN')">สแกน QR เพื่อเข้างาน</button>
+            <button class="btn btn-out" onclick="startScanner('OUT')">สแกน QR เพื่อออกงาน</button>
         </div>
 
         <div id="scanner-page" class="hidden">
@@ -60,16 +60,12 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_Gq2Cl2_XU8T4YumgEZiPl4zsdLuyv58PlZeeFWrrXXg0T1ODnSyRBskdEFDu9aok/exec";
         const QR_SECRET = "อบต.ดงตะงาว"; 
-        
-        // --- 🚩 พิกัด อบต. ดงตะงาว 🚩 ---
         const targetLat = 14.610752; 
         const targetLng = 100.581508; 
-        const maxDistance = 15; // เข้มงวด 15 เมตรตามที่ผู้หมู่ตั้งไว้
-        // ----------------------------------------
+        const maxDistance = 30; // ปรับเป็น 30 เมตรให้สแกนติดง่ายขึ้นครับ
 
         let currentId = "", currentType = "", video = document.createElement("video"), scanning = false;
         let countdown;
-        let timeLeft = 10;
 
         window.onload = () => {
             setTimeout(() => { document.getElementById('splash-screen').classList.add('hidden'); }, 2000);
@@ -86,13 +82,9 @@
 
             fetch(WEB_APP_URL + "?id=" + encodeURIComponent(currentId) + "&type=CHECK_NAME")
             .then(res => res.text()).then(data => {
-                if(data.includes("|")) {
-                    const parts = data.split("|");
-                    document.getElementById('displayName').innerText = "รหัส " + currentId + " " + parts[0];
-                    document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-");
-                } else {
-                    document.getElementById('displayName').innerText = "รหัส " + currentId + " " + data;
-                }
+                const parts = data.split("|");
+                document.getElementById('displayName').innerText = "รหัส " + currentId + " " + parts[0];
+                document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-");
             });
         }
 
@@ -100,17 +92,12 @@
             currentType = type;
             document.getElementById('main-page').classList.add('hidden');
             document.getElementById('scanner-page').classList.remove('hidden');
-            
-            timeLeft = 10;
+            let timeLeft = 10;
             document.getElementById('timer-text').innerText = timeLeft;
             countdown = setInterval(() => {
                 timeLeft--;
                 document.getElementById('timer-text').innerText = timeLeft;
-                if(timeLeft <= 0) {
-                    clearInterval(countdown);
-                    alert("หมดเวลาสแกน ระบบจะกลับไปหน้าแรก");
-                    stopScanner();
-                }
+                if(timeLeft <= 0) { stopScanner(); alert("หมดเวลาสแกนครับ"); }
             }, 1000);
 
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
@@ -125,9 +112,7 @@
         function stopScanner() {
             clearInterval(countdown);
             scanning = false;
-            if(video.srcObject) {
-                video.srcObject.getTracks().forEach(track => track.stop());
-            }
+            if(video.srcObject) video.srcObject.getTracks().forEach(track => track.stop());
             location.reload(); 
         }
 
@@ -138,9 +123,7 @@
                 canvasElement.height = video.videoHeight;
                 canvasElement.width = video.videoWidth;
                 canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-                const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height);
-
+                const code = jsQR(canvas.getImageData(0, 0, canvasElement.width, canvasElement.height).data, canvasElement.width, canvasElement.height);
                 if (code && code.data === QR_SECRET) {
                     clearInterval(countdown);
                     scanning = false;
@@ -151,51 +134,28 @@
             if(scanning) requestAnimationFrame(tick);
         }
 
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3;
-            const p1 = lat1 * Math.PI/180;
-            const p2 = lat2 * Math.PI/180;
-            const dp = (lat2-lat1) * Math.PI/180;
-            const dl = (lon2-lon1) * Math.PI/180;
-            const a = Math.sin(dp/2) * Math.sin(dp/2) +
-                      Math.cos(p1) * Math.cos(p2) *
-                      Math.sin(dl/2) * Math.sin(dl/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-
         function checkLocationAndSend() {
-            if (!navigator.geolocation) return alert("มือถือไม่รองรับระบบพิกัด");
-            document.getElementById('scanStatus').innerText = "กำลังคำนวณพิกัดให้แม่นยำที่สุด...";
-            
-            // เพิ่ม options เพื่อความแม่นยำสูง
-            const geoOptions = {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            };
-
+            document.getElementById('scanStatus').innerText = "ตรวจสอบพิกัด GPS...";
             navigator.geolocation.getCurrentPosition(function(pos) {
-                const dist = getDistance(pos.coords.latitude, pos.coords.longitude, targetLat, targetLng);
+                const R = 6371e3;
+                const p1 = pos.coords.latitude * Math.PI/180, p2 = targetLat * Math.PI/180;
+                const dp = (targetLat-pos.coords.latitude) * Math.PI/180, dl = (targetLng-pos.coords.longitude) * Math.PI/180;
+                const a = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+                const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
                 if (dist > maxDistance) {
-                    alert("⚠️ บันทึกไม่ได้! คุณห่างจากจุดเช็กอิน " + Math.round(dist) + " เมตร (จำกัด 15 ม.)");
+                    alert("⚠️ อยู่นอกพื้นที่ อบต. (ห่าง " + Math.round(dist) + " ม.)");
                     location.reload();
                 } else {
                     sendData();
                 }
-            }, function(err) {
-                alert("กรุณาเปิด GPS และอนุญาตสิทธิ์ตำแหน่งครับ");
-                location.reload();
-            }, geoOptions);
+            }, () => { alert("กรุณาเปิด GPS ครับ"); location.reload(); }, { enableHighAccuracy: true });
         }
 
         function sendData() {
-            document.getElementById('scanStatus').innerText = "พิกัดถูกต้อง กำลังบันทึก...";
+            document.getElementById('scanStatus').innerText = "กำลังบันทึก...";
             fetch(WEB_APP_URL + "?id=" + encodeURIComponent(currentId) + "&type=" + currentType)
-            .then(res => res.text()).then(data => {
-                alert(data);
-                location.reload();
-            });
+            .then(res => res.text()).then(data => { alert(data); location.reload(); });
         }
     </script>
 </body>
