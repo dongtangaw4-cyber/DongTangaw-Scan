@@ -160,7 +160,7 @@
         const QR_SECRET = "อบต.ดงตะงาว"; 
         const targetLat = 14.610752; 
         const targetLng = 100.581508; 
-        const maxDistance = 15; // ปรับเป็น 30 เมตรตามที่เคยแนะนำครับ
+        const maxDistance = 7;
 
         let currentId = "", currentType = "", video = document.createElement("video"), scanning = false;
         let countdown;
@@ -243,11 +243,32 @@
             }, () => { alert("กรุณาเปิด GPS ครับ"); location.reload(); }, { enableHighAccuracy: true });
         }
 
-        function sendData() {
-            document.getElementById('scanStatus').innerText = "กำลังบันทึก...";
-            fetch(WEB_APP_URL + "?id=" + encodeURIComponent(currentId) + "&type=" + currentType)
-            .then(res => res.text()).then(data => { alert(data); location.reload(); });
-        }
+       function sendData() {
+    document.getElementById('scanStatus').innerText = "กำลังส่งข้อมูลและรูปถ่าย...";
+    
+    // 📸 จับภาพจาก Canvas (ที่ใช้สแกน QR) แปลงเป็นรูปภาพ Base64
+    const canvasElement = document.getElementById("canvas");
+    const imageData = canvasElement.toDataURL("image/jpeg", 0.5); // บีบอัดรูปให้เล็กลงครึ่งหนึ่ง
+
+    const formData = new URLSearchParams();
+    formData.append("id", currentId);
+    formData.append("type", currentType);
+    formData.append("image", imageData); // ส่งรูปไปด้วย
+
+    fetch(WEB_APP_URL, {
+        method: "POST", // เปลี่ยนเป็น POST เพื่อส่งข้อมูลรูปภาพขนาดใหญ่
+        body: formData
+    })
+    .then(res => res.text())
+    .then(data => { 
+        alert(data); 
+        location.reload(); 
+    })
+    .catch(err => {
+        alert("เกิดข้อผิดพลาด: " + err);
+        location.reload();
+    });
+}
     </script>
 </body>
 </html>
