@@ -64,7 +64,7 @@
         const QR_SECRET = "อบต.ดงตะงาว"; 
         const targetLat = 14.610752; 
         const targetLng = 100.581508; 
-        const maxDistance = 30; // ขยายเป็น 30 เมตรเพื่อความลื่นไหลครับ
+        const maxDistance = 30;
 
         let currentId = "", currentType = "", video = document.createElement("video"), scanning = false;
         let countdown;
@@ -144,61 +144,31 @@
             { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 });
         }
 
-       function sendData() {
-    document.getElementById('scanStatus').innerText = "กำลังส่งข้อมูล...";
-    
-    const canvasElement = document.getElementById("canvas");
-    const imageData = canvasElement.toDataURL("image/jpeg", 0.3); // บีบอัดรูป
+        function sendData() {
+            document.getElementById('scanStatus').innerText = "กำลังส่งข้อมูล...";
+            
+            const canvasElement = document.getElementById("canvas");
+            const imageData = canvasElement.toDataURL("image/jpeg", 0.3);
 
-    if (video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-    }
+            const formData = new FormData();
+            formData.append("id", currentId);
+            formData.append("type", currentType);
+            formData.append("image", imageData);
 
-    // ใช้ FormData แบบมาตรฐาน (วิธีนี้ชัวร์ที่สุด)
-    const formData = new FormData();
-    formData.append("id", currentId);
-    formData.append("type", currentType);
-    formData.append("image", imageData);
-
-    fetch(WEB_APP_URL, {
-        method: "POST",
-        body: formData // ส่งเป็นฟอร์ม
-    })
-    .then(res => res.text())
-    .then(data => {
-        alert("✅ บันทึกสำเร็จ: " + data);
-        location.reload();
-    })
-    .catch(err => {
-        // ถ้าขึ้น Error ตรงนี้ แปลว่า URL ของ Google Script ผิด หรือยังไม่ได้ Deploy ใหม่
-        alert("ส่งไม่สำเร็จ! กรุณาเช็กเน็ตหรือตรวจสอบสิทธิ์: " + err);
-        location.reload();
-    });
-}
-
-    // สร้างก้อนข้อมูลแบบ JSON
-    const payload = {
-        id: currentId,
-        type: currentType,
-        image: imageData
-    };
-
-    fetch(WEB_APP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        cache: "no-cache",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload) // ส่งแบบก้อน JSON
-    })
-    .then(() => {
-        alert("✅ บันทึกสำเร็จแล้วครับ!");
-        location.reload();
-    })
-    .catch(err => {
-        alert("ส่งไม่สำเร็จ: " + err);
-        location.reload();
-    });
-}
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.text())
+            .then(data => {
+                alert("✅ บันทึกสำเร็จ: " + data);
+                location.reload();
+            })
+            .catch(err => {
+                alert("ส่งไม่สำเร็จ! กรุณาเช็กเน็ตหรือตรวจสอบสิทธิ์: " + err);
+                location.reload();
+            });
+        }
     </script>
 </body>
 </html>
