@@ -148,11 +148,33 @@
     document.getElementById('scanStatus').innerText = "กำลังส่งข้อมูล...";
     
     const canvasElement = document.getElementById("canvas");
-    const imageData = canvasElement.toDataURL("image/jpeg", 0.3); // บีบให้เล็กลงอีกนิดเพื่อความไว
+    const imageData = canvasElement.toDataURL("image/jpeg", 0.3); // บีบอัดรูป
 
     if (video.srcObject) {
         video.srcObject.getTracks().forEach(track => track.stop());
     }
+
+    // ใช้ FormData แบบมาตรฐาน (วิธีนี้ชัวร์ที่สุด)
+    const formData = new FormData();
+    formData.append("id", currentId);
+    formData.append("type", currentType);
+    formData.append("image", imageData);
+
+    fetch(WEB_APP_URL, {
+        method: "POST",
+        body: formData // ส่งเป็นฟอร์ม
+    })
+    .then(res => res.text())
+    .then(data => {
+        alert("✅ บันทึกสำเร็จ: " + data);
+        location.reload();
+    })
+    .catch(err => {
+        // ถ้าขึ้น Error ตรงนี้ แปลว่า URL ของ Google Script ผิด หรือยังไม่ได้ Deploy ใหม่
+        alert("ส่งไม่สำเร็จ! กรุณาเช็กเน็ตหรือตรวจสอบสิทธิ์: " + err);
+        location.reload();
+    });
+}
 
     // สร้างก้อนข้อมูลแบบ JSON
     const payload = {
