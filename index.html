@@ -196,26 +196,21 @@
             return id;
         }
 
-      function login() {
-    const loginBtn = document.querySelector('.btn-login'); // ดึงปุ่มเข้าสู่ระบบมาจัดการ
+     function login() {
+    const loginBtn = document.querySelector('.btn-login');
     currentId = document.getElementById('empId').value.trim();
-    
     if(!currentId) return alert("กรุณากรอกรหัสพนักงาน");
 
-    // 🔄 1. เริ่มสถานะกำลังโหลด
-    loginBtn.innerText = "⏳ กำลังเข้าสู่ระบบ..."; // เปลี่ยนข้อความบนปุ่ม
-    loginBtn.style.opacity = "0.7";             // ทำให้ปุ่มดูจางลง
-    loginBtn.disabled = true;                   // ล็อกปุ่มกันกดซ้ำ
+    loginBtn.innerText = "⏳ กำลังเข้าสู่ระบบ...";
+    loginBtn.disabled = true;
     
     const devId = getDeviceId();
     
-    // 🌐 2. ส่งข้อมูลไปเช็กที่ Google Script
+    // ส่งไปเช็คที่ Google Script
     fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=CHECK_NAME&deviceId=${devId}`)
     .then(res => res.text())
     .then(data => {
-        // 3. เมื่อได้คำตอบ ให้คืนค่าปุ่มกลับมาปกติก่อน
         loginBtn.innerText = "เข้าสู่ระบบ";
-        loginBtn.style.opacity = "1";
         loginBtn.disabled = false;
 
         if(data.startsWith("DENIED")) {
@@ -225,20 +220,24 @@
         }
         if(data === "ไม่พบรหัสพนักงาน") return alert(data);
         
+        // ข้อมูลที่ส่งกลับมาคือ: ชื่อ|ตำแหน่ง|เบอร์|เวลาเข้าล่าสุด
         const parts = data.split("|");
-        // แสดงข้อมูลพนักงาน
+        
+        // 📍 หยอดข้อมูลลง ID ต่างๆ ที่เราสร้างไว้
         document.getElementById('displayId').innerText = "รหัส: " + currentId;
-        document.getElementById('displayName').innerText = parts[0];
-        document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-");
+        document.getElementById('displayName').innerText = parts[0];          // ชื่อ
+        document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-"); // ตำแหน่ง
+        
+        // ถ้ามีเบอร์โทร (สร้าง ID เพิ่มถ้ายังไม่มี) และสถานะเวลา
+        if(document.getElementById('displayPhone')) {
+            document.getElementById('displayPhone').innerText = "เบอร์โทร: " + (parts[2] || "-");
+        }
+        
+        // หยอดคำว่า "ตั้งแต่"
+        document.getElementById('displayStatusTime').innerText = "ตั้งแต่: " + (parts[3] || "ยังไม่มีข้อมูลวันนี้");
         
         document.getElementById('login-page').classList.add('hidden');
         document.getElementById('main-page').classList.remove('hidden');
-    })
-    .catch(err => {
-        // กรณีเน็ตหลุดหรือ Error
-        loginBtn.innerText = "เข้าสู่ระบบ";
-        loginBtn.disabled = false;
-        alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่");
     });
 }
 
