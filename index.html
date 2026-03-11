@@ -143,11 +143,11 @@
                 <span style="display: block; font-size: 18px; font-weight: 600; color: var(--primary);">เวลาตอนนี้</span>
                 <span id="displayTime" style="display: block; font-size: 34px; font-weight: 800; color: var(--primary);">00:00:00</span>
                 
-            <div style="background: #eef2f7; padding: 10px; border-radius: 12px; margin-top: 15px; border: 1px solid #d1d5db;">
-				<span id="displayStatusTime" style="display: block; font-size: 15px; color: #334155; font-weight: bold;">
-				สถานะตอนนี้: กำลังตรวจสอบ...
-				</span>
-			</div>
+                <div style="background: #eef2f7; padding: 10px; border-radius: 12px; margin-top: 15px; border: 1px solid #d1d5db;">
+                    <span id="displayStatusTime" style="display: block; font-size: 15px; color: #334155; font-weight: bold;">
+                        สถานะตอนนี้: กำลังตรวจสอบ...
+                    </span>
+                </div>
             </div>
 
             <button class="btn-main btn-in" onclick="startScanner('IN')"><span>📍 บันทึกเข้างาน</span></button>
@@ -220,22 +220,22 @@
                 
                 const parts = data.split("|");
                 const statusBox = document.getElementById('displayStatusTime');
-                const statusResult = parts[3]; // รับค่า "คุณมาสาย" หรือ "คุณมาปกติ" จาก Apps Script
+                const statusResult = parts[3]; 
 
-                // 📍 แสดงข้อมูลพนักงาน
+                // หยอดข้อมูลพนักงาน
                 document.getElementById('displayId').innerText = "รหัส: " + currentId;
                 document.getElementById('displayName').innerText = parts[0];
                 document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-");
                 document.getElementById('displayPhone').innerText = "เบอร์โทร: " + (parts[2] || "-");
                 
-                // 📍 แสดงสถานะตอนนี้
+                // หยอดสถานะ
                 statusBox.innerText = "สถานะตอนนี้: " + statusResult;
 
-                // 🎨 ใส่สีเน้นตามคำตอบที่ได้จากหลังบ้าน
-                if(statusResult.includes("สาย")) {
-                    statusBox.style.color = "var(--danger)"; // สีแดง
+                // ใส่สีตามสถานะ
+                if(statusResult && statusResult.includes("สาย")) {
+                    statusBox.style.color = "var(--danger)";
                 } else {
-                    statusBox.style.color = "var(--success)"; // สีเขียว
+                    statusBox.style.color = "var(--success)";
                 }
 
                 document.getElementById('login-page').classList.add('hidden');
