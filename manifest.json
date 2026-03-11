@@ -1,6 +1,6 @@
 {
-  "name": "ระบบลงเวลา อบต.ดงตะงาว",
-  "short_name": "ลงเวลา อบต.",
+  "name": "ABT IN/OUT",
+  "short_name": "ABT IN/OUT.",
   "description": "ระบบบันทึกเวลาเข้า-ออกงาน อบต.ดงตะงาว",
   "start_url": "index.html",
   "display": "standalone",
