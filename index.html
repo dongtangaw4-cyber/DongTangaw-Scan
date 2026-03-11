@@ -15,14 +15,14 @@
         --card-bg: #ffffff;
     }
     
-    * { box-sizing: border-box; } /* กันส่วนประกอบดันกันจนเบี้ยว */
+    * { box-sizing: border-box; }
 
     body { 
         font-family: 'Sarabun', sans-serif; 
         background-color: var(--bg); 
         display: flex; 
-        justify-content: center; /* จัดกลางแนวนอน */
-        align-items: center;     /* จัดกลางแนวตั้ง */
+        justify-content: center; 
+        align-items: center;     
         min-height: 100vh; 
         margin: 0; 
         padding: 20px;
@@ -34,9 +34,8 @@
         border-radius: 24px; 
         box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
         width: 100%; 
-        max-width: 400px; /* ขนาดกำลังดีสำหรับมือถือและคอม */
+        max-width: 400px; 
         text-align: center;
-        transition: transform 0.3s ease;
     }
 
     #splash-screen { 
@@ -47,7 +46,6 @@
 
     .hidden { display: none !important; }
 
-    /* ปรับแต่งช่องกรอกรหัสให้ดูพรีเมียม */
     input { 
         width: 100%; 
         padding: 18px; 
@@ -60,16 +58,8 @@
         color: var(--primary);
         outline: none; 
         background: #f8fafc;
-        transition: all 0.3s ease;
     }
     
-    input:focus {
-        border-color: var(--primary);
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(0,112,243,0.1);
-    }
-
-    /* ปรับแต่งปุ่มให้ดูมีมิติ */
     .btn-main { 
         width: 100%; 
         padding: 18px; 
@@ -104,8 +94,7 @@
         font-size: 36px; 
         font-weight: 800; 
         color: var(--primary); 
-        margin-top: 10px;
-        letter-spacing: 2px;
+        margin-top: 5px;
     }
 
     #scanner-container { 
@@ -116,7 +105,6 @@
         overflow: hidden; 
         margin: 20px auto;
         border: 4px solid #fff;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
 
     .btn-back {
@@ -125,8 +113,11 @@
         margin-top: 20px;
         text-decoration: none;
         display: inline-block;
+        cursor: pointer;
+        font-weight: bold;
     }
 </style>
+</head>
 <body>
     <div id="splash-screen">
         <h1 style="color: var(--primary); margin-bottom: 10px; font-size: 32px;">อบต.ดงตะงาว</h1>
@@ -140,27 +131,31 @@
             <input type="text" id="empId" placeholder="กรอกรหัส เช่น ป01" autocomplete="off">
             <button class="btn-main btn-login" onclick="login()">เข้าสู่ระบบ</button>
         </div>
-<div id="main-page" class="hidden">
-    <div class="info-box">
-        <span id="displayId" style="font-weight:bold; font-size: 16px; color: var(--primary); display: block; margin-bottom: 2px;">รหัส: ...</span>
-        <span id="displayName" style="font-weight:bold; font-size: 22px; color: #1e293b; display: block;">ชื่อ-นามสกุล</span>
-        <span id="displayPos" style="font-size: 15px; color: #64748b; display: block; margin-top: 4px;">ตำแหน่ง: ...</span>
 
-        <div style="margin: 15px auto; width: 80%; border-top: 1px solid #e2e8f0;"></div>
-		<span style="display: block; font-size: 20px; font-weight: 600; color: var(--primary);">เวลาตอนนี้</span>
-        <span id="displayTime" style="display: block; font-size: 34px; font-weight: 800; color: var(--primary);">00:00:00</span>
-        
-        
-    </div>
+        <div id="main-page" class="hidden">
+            <div class="info-box">
+                <span id="displayId" style="font-weight:bold; font-size: 16px; color: var(--primary); display: block; margin-bottom: 2px;">รหัส: ...</span>
+                <span id="displayName" style="font-weight:bold; font-size: 22px; color: #1e293b; display: block;">ชื่อ-นามสกุล</span>
+                <span id="displayPos" style="font-size: 15px; color: #64748b; display: block; margin-top: 4px;">ตำแหน่ง: ...</span>
+                <span id="displayPhone" style="font-size: 14px; color: #64748b; display: block; margin-top: 2px;">เบอร์โทร: -</span>
 
-    <button class="btn-main btn-in" onclick="startScanner('IN')"><span>📍 บันทึกเข้างาน</span></button>
-	<span id="displayStatusTime" style="display: block; font-size: 15px; color: #64748b; margin-top: 8px; font-weight: bold;">**ก่อนเวลา 8.30 น.**</span>
-    <button class="btn-main btn-out" onclick="startScanner('OUT')"><span>🏠 บันทึกออกงาน</span></button>
-	<span id="displayStatusTime" style="display: block; font-size: 15px; color: #64748b; margin-top: 8px; font-weight: bold;">**ตั้งแต่เวลา 16.30 น. เป็นต้นไป**</span>
-    <button class="btn-back" onclick="location.reload()" style="margin-top: 30px; display: inline-block; width: auto;">
-        ← ออกจากระบบ
-    </button>
-</div>
+                <div style="margin: 15px auto; width: 80%; border-top: 1px solid #e2e8f0;"></div>
+                <span style="display: block; font-size: 18px; font-weight: 600; color: var(--primary);">เวลาตอนนี้</span>
+                <span id="displayTime" style="display: block; font-size: 34px; font-weight: 800; color: var(--primary);">00:00:00</span>
+                
+                <div style="background: #eef2f7; padding: 10px; border-radius: 12px; margin-top: 15px;">
+                    <span id="displayStatusTime" style="display: block; font-size: 15px; color: var(--primary); font-weight: bold;">บันทึกล่าสุด: ยังไม่มีข้อมูลวันนี้</span>
+                </div>
+            </div>
+
+            <button class="btn-main btn-in" onclick="startScanner('IN')"><span>📍 บันทึกเข้างาน</span></button>
+            <p style="font-size: 13px; color: #64748b; margin: -5px 0 15px 0;">** ก่อนเวลา 08.30 น. **</p>
+
+            <button class="btn-main btn-out" onclick="startScanner('OUT')"><span>🏠 บันทึกออกงาน</span></button>
+            <p style="font-size: 13px; color: #64748b; margin: -5px 0 15px 0;">** ตั้งแต่เวลา 16.30 น. เป็นต้นไป **</p>
+
+            <div class="btn-back" onclick="location.reload()">← ออกจากระบบ</div>
+        </div>
 
         <div id="scanner-page" class="hidden">
             <h3 style="margin-top:0;">สแกนคิวอาร์โค้ด</h3>
@@ -180,13 +175,15 @@
         let currentId = "", currentType = "", video = document.createElement("video"), scanning = false, countdown;
 
         window.onload = () => {
-            setTimeout(() => { document.getElementById('splash-screen').style.opacity = '0'; 
-                setTimeout(()=> document.getElementById('splash-screen').classList.add('hidden'), 800);
+            setTimeout(() => { 
+                document.getElementById('splash-screen').style.opacity = '0'; 
+                setTimeout(()=> document.getElementById('splash-screen').classList.add('hidden'), 500);
             }, 2000);
-            setInterval(() => { document.getElementById('displayTime').innerText = new Date().toLocaleTimeString('th-TH'); }, 1000);
+            setInterval(() => { 
+                document.getElementById('displayTime').innerText = new Date().toLocaleTimeString('th-TH'); 
+            }, 1000);
         };
 
-        // 🔒 สร้างรหัสเครื่องเฉพาะตัว
         function getDeviceId() {
             let id = localStorage.getItem('abt_device_id');
             if (!id) {
@@ -196,50 +193,46 @@
             return id;
         }
 
-     function login() {
-    const loginBtn = document.querySelector('.btn-login');
-    currentId = document.getElementById('empId').value.trim();
-    if(!currentId) return alert("กรุณากรอกรหัสพนักงาน");
+        function login() {
+            const loginBtn = document.querySelector('.btn-login');
+            currentId = document.getElementById('empId').value.trim();
+            if(!currentId) return alert("กรุณากรอกรหัสพนักงาน");
 
-    loginBtn.innerText = "⏳ กำลังเข้าสู่ระบบ...";
-    loginBtn.disabled = true;
-    
-    const devId = getDeviceId();
-    
-    // ส่งไปเช็คที่ Google Script
-    fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=CHECK_NAME&deviceId=${devId}`)
-    .then(res => res.text())
-    .then(data => {
-        loginBtn.innerText = "เข้าสู่ระบบ";
-        loginBtn.disabled = false;
+            loginBtn.innerText = "⏳ กำลังเข้าสู่ระบบ...";
+            loginBtn.disabled = true;
+            
+            const devId = getDeviceId();
+            
+            fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=CHECK_NAME&deviceId=${devId}`)
+            .then(res => res.text())
+            .then(data => {
+                loginBtn.innerText = "เข้าสู่ระบบ";
+                loginBtn.disabled = false;
 
-        if(data.startsWith("DENIED")) {
-            alert("❌ " + data.split("|")[1]);
-            location.reload();
-            return;
+                if(data.startsWith("DENIED")) {
+                    alert("❌ " + data.split("|")[1]);
+                    location.reload();
+                    return;
+                }
+                if(data === "ไม่พบรหัสพนักงาน") return alert(data);
+                
+                const parts = data.split("|");
+                
+                document.getElementById('displayId').innerText = "รหัส: " + currentId;
+                document.getElementById('displayName').innerText = parts[0];
+                document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-");
+                document.getElementById('displayPhone').innerText = "เบอร์โทร: " + (parts[2] || "-");
+                document.getElementById('displayStatusTime').innerText = "บันทึกล่าสุด: " + (parts[3] || "ยังไม่มีข้อมูลวันนี้");
+                
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('main-page').classList.remove('hidden');
+            })
+            .catch(err => {
+                loginBtn.innerText = "เข้าสู่ระบบ";
+                loginBtn.disabled = false;
+                alert("การเชื่อมต่อมีปัญหา กรุณาลองใหม่ครับ");
+            });
         }
-        if(data === "ไม่พบรหัสพนักงาน") return alert(data);
-        
-        // ข้อมูลที่ส่งกลับมาคือ: ชื่อ|ตำแหน่ง|เบอร์|เวลาเข้าล่าสุด
-        const parts = data.split("|");
-        
-        // 📍 หยอดข้อมูลลง ID ต่างๆ ที่เราสร้างไว้
-        document.getElementById('displayId').innerText = "รหัส: " + currentId;
-        document.getElementById('displayName').innerText = parts[0];          // ชื่อ
-        document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-"); // ตำแหน่ง
-        
-        // ถ้ามีเบอร์โทร (สร้าง ID เพิ่มถ้ายังไม่มี) และสถานะเวลา
-        if(document.getElementById('displayPhone')) {
-            document.getElementById('displayPhone').innerText = "เบอร์โทร: " + (parts[2] || "-");
-        }
-        
-        // หยอดคำว่า "ตั้งแต่"
-        document.getElementById('displayStatusTime').innerText = "ตั้งแต่: " + (parts[3] || "ยังไม่มีข้อมูลวันนี้");
-        
-        document.getElementById('login-page').classList.add('hidden');
-        document.getElementById('main-page').classList.remove('hidden');
-    });
-}
 
         function startScanner(type) {
             currentType = type;
