@@ -143,16 +143,18 @@
                 <span style="display: block; font-size: 18px; font-weight: 600; color: var(--primary);">เวลาตอนนี้</span>
                 <span id="displayTime" style="display: block; font-size: 34px; font-weight: 800; color: var(--primary);">00:00:00</span>
                 
-                <div style="background: #eef2f7; padding: 10px; border-radius: 12px; margin-top: 15px; border: 1px solid #d1d5db;">
-                    <span id="displayStatusTime" style="display: block; font-size: 14px; color: #334155; font-weight: bold;">ยังไม่มีข้อมูลบันทึกวันนี้</span>
-                </div>
+            <div style="background: #eef2f7; padding: 10px; border-radius: 12px; margin-top: 15px; border: 1px solid #d1d5db;">
+				<span id="displayStatusTime" style="display: block; font-size: 15px; color: #334155; font-weight: bold;">
+				สถานะตอนนี้: กำลังตรวจสอบ...
+				</span>
+			</div>
             </div>
 
             <button class="btn-main btn-in" onclick="startScanner('IN')"><span>📍 บันทึกเข้างาน</span></button>
-            <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">** ก่อนเวลา 08.30 น. (ปกติ) **</p>
+            <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">**ก่อนเวลา 08.30 น.**</p>
 
             <button class="btn-main btn-out" onclick="startScanner('OUT')"><span>🏠 บันทึกออกงาน</span></button>
-            <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">** ตั้งแต่เวลา 16.30 น. เป็นต้นไป **</p>
+            <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">**ตั้งแต่เวลา 16.30 น. เป็นต้นไป**</p>
 
             <div class="btn-back" onclick="location.reload()">← ออกจากระบบ</div>
         </div>
@@ -217,22 +219,23 @@
                 if(data === "ไม่พบรหัสพนักงาน") return alert(data);
                 
                 const parts = data.split("|");
-                
+                const statusBox = document.getElementById('displayStatusTime');
+                const statusResult = parts[3]; // รับค่า "คุณมาสาย" หรือ "คุณมาปกติ" จาก Apps Script
+
+                // 📍 แสดงข้อมูลพนักงาน
                 document.getElementById('displayId').innerText = "รหัส: " + currentId;
                 document.getElementById('displayName').innerText = parts[0];
                 document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-");
                 document.getElementById('displayPhone').innerText = "เบอร์โทร: " + (parts[2] || "-");
                 
-                // 📍 แสดงเวลาสแกนล่าสุด และสถานะ (สาย/ปกติ)
-                const statusBox = document.getElementById('displayStatusTime');
-                const statusText = parts[3] || "ยังไม่มีข้อมูลวันนี้";
-                statusBox.innerText = "บันทึกล่าสุด: " + statusText;
-                
-                // เปลี่ยนสีตามสถานะ
-                if(statusText.includes("สาย")) {
-                    statusBox.style.color = "var(--danger)";
-                } else if(statusText.includes("ปกติ")) {
-                    statusBox.style.color = "var(--success)";
+                // 📍 แสดงสถานะตอนนี้
+                statusBox.innerText = "สถานะตอนนี้: " + statusResult;
+
+                // 🎨 ใส่สีเน้นตามคำตอบที่ได้จากหลังบ้าน
+                if(statusResult.includes("สาย")) {
+                    statusBox.style.color = "var(--danger)"; // สีแดง
+                } else {
+                    statusBox.style.color = "var(--success)"; // สีเขียว
                 }
 
                 document.getElementById('login-page').classList.add('hidden');
