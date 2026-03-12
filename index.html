@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบลงเวลา อบต.ดงตะงาว</title>
+    <title>ABT IN/OUT</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0070f3">
-    <link rel="apple-touch-icon" href="icon-512.png">
+    <link rel="apple-touch-icon" href="logo1.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
@@ -34,20 +34,53 @@
         padding: 20px;
     }
 
+    /* กรอบขาวสมส่วน กระชับแนวตั้ง */
     .container { 
         background: var(--card-bg); 
-        padding: 40px 30px; 
+        padding: 20px 30px; 
         border-radius: 24px; 
         box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
         width: 100%; 
-        max-width: 400px; 
+        max-width: 360px; 
         text-align: center;
+        margin: 10px auto;
     }
 
+    .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0px;
+        margin-bottom: 15px;
+    }
+    .logo-img { 
+	width: 125px; 
+	height: 105px; 
+	object-fit: contain; 
+	margin-right: -10px; 
+	}
+    
+	.icon-img { 
+	width: 110px; 
+	height: 105px; 
+	object-fit: contain; 
+	margin-left: -10px; 
+	}
+
+    /* หน้า Splash แบบพรีเมียม */
     #splash-screen { 
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        background: white; display: flex; flex-direction: column; 
-        justify-content: center; align-items: center; z-index: 1000; transition: 0.5s; 
+        background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%); 
+        display: flex; flex-direction: column; 
+        justify-content: center; align-items: center; 
+        z-index: 1000; transition: 0.8s; 
+    }
+
+    .splash-content { text-align: center; animation: fadeIn 1.2s ease-out; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .hidden { display: none !important; }
@@ -55,82 +88,81 @@
     input { 
         width: 100%; 
         padding: 18px; 
-        margin: 25px 0; 
+        margin: 20px 0; 
         border: 2px solid #e1e8f0; 
-        border-radius: 16px; 
+        border-radius: 18px; 
         text-align: center; 
-        font-size: 24px; 
-        font-weight: bold;
+        
+        /* เปลี่ยนฟอนต์ที่นี่ */
+        font-family: 'Sarabun', sans-serif; 
+        font-size: 20px; 
+        font-weight: 600;
+        
         color: var(--primary);
         outline: none; 
         background: #f8fafc;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); /* ใส่เงาข้างในเบาๆ */
+        transition: all 0.3s ease;
+    }
+
+    /* เพิ่มเอฟเฟกต์ตอนกดพิมพ์ */
+    input:focus {
+        border-color: var(--primary);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(0, 112, 243, 0.1);
     }
     
     .btn-main { 
-        width: 100%; 
-        padding: 18px; 
-        margin: 10px 0; 
-        border: none; 
-        border-radius: 16px; 
-        font-size: 20px; 
-        font-weight: bold; 
-        cursor: pointer; 
-        color: white; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        width: 100%; max-width: 280px; padding: 18px; margin: 10px auto; 
+        border: none; border-radius: 16px; font-size: 20px; font-weight: bold; 
+        cursor: pointer; color: white; display: flex; align-items: center; 
+        justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         transition: all 0.2s ease;
     }
-
+    
+    .btn-main span { display: flex; align-items: center; gap: 10px; }
     .btn-main:active { transform: scale(0.97); }
     .btn-login { background: linear-gradient(135deg, #0056b3, #0070f3); }
     .btn-in { background: linear-gradient(135deg, #27ae60, #2ecc71); }
-    .btn-out { background: linear-gradient(135deg, #2c3e50, #455a64); }
+    .btn-out { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
 
-    .info-box { 
-        background: #f1f5f9; 
-        padding: 25px; 
-        border-radius: 20px; 
-        margin-bottom: 25px; 
-        border: 1px solid #e2e8f0;
-    }
+    .info-box { background: #f1f5f9; padding: 25px; border-radius: 20px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
 
-    #displayTime { 
-        font-size: 36px; 
-        font-weight: 800; 
-        color: var(--primary); 
-        margin-top: 5px;
-    }
+    #displayTime { font-size: 36px; font-weight: 800; color: var(--primary); margin-top: 5px; }
 
-    #scanner-container { 
-        width: 100%; 
-        height: 280px; 
-        background: #000; 
-        border-radius: 20px; 
-        overflow: hidden; 
-        margin: 20px auto;
-        border: 4px solid #fff;
-    }
+    #scanner-container { width: 100%; height: 280px; background: #000; border-radius: 20px; overflow: hidden; margin: 20px auto; border: 4px solid #fff; }
 
-    .btn-back {
-        color: #94a3b8;
-        font-size: 14px;
-        margin-top: 25px;
-        text-decoration: none;
-        display: inline-block;
-        cursor: pointer;
-        font-weight: bold;
-    }
+    .btn-back { color: #94a3b8; font-size: 14px; margin-top: 25px; text-decoration: none; display: inline-block; cursor: pointer; font-weight: bold; }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div id="splash-screen">
-        <h1 style="color: var(--primary); margin-bottom: 10px; font-size: 32px;">อบต.ดงตะงาว</h1>
-        <p style="color: #64748b;">กำลังโหลดระบบสแกนเข้างาน/ออกงาน...</p>
+        <div class="splash-content">
+            <div class="logo-container">
+                <img src="logo.png" class="logo-img">
+                <img src="logo1.png" class="icon-img">
+            </div>
+            <h1 style="color: var(--primary); margin: 0; font-size: 36px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,112,243,0.1);">
+                อบต.ดงตะงาว
+			<h2>ABT IN/OUT</h2>
+            </h1>
+            <p style="color: #64748b; margin-top: 5px; font-size: 18px; letter-spacing: 1px;">
+                ระบบลงเวลาเข้างาน/ออกงาน....
+            </p>
+            <div style="margin-top: 30px;">
+                <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+            </div>
+        </div>
     </div>
 
     <div class="container">
+        <div class="logo-container">
+            <img src="logo.png" class="logo-img">
+            <img src="logo1.png" class="icon-img">
+        </div>
+
         <div id="login-page">
             <h2 style="margin: 0; color: #1e293b;">ยินดีต้อนรับ</h2>
             <p style="color: #64748b; margin-bottom: 10px;">ระบุรหัสพนักงานเพื่อเริ่มงาน</p>
@@ -157,16 +189,16 @@
             </div>
 
             <button class="btn-main btn-in" onclick="startScanner('IN')"><span>📍 บันทึกเข้างาน</span></button>
-            <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">**ก่อนเวลา 08.30 น.**</p>
+            <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">**เข้างานก่อนเวลา 08.30 น.**</p>
 
             <button class="btn-main btn-out" onclick="startScanner('OUT')"><span>🏠 บันทึกออกงาน</span></button>
-            <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">**ตั้งแต่เวลา 16.30 น. เป็นต้นไป**</p>
-
+            <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">**ออกงานตั้งแต่เวลา 16.30 น. เป็นต้นไป**</p>
             <div class="btn-back" onclick="logout()">← ออกจากระบบ</div>
         </div>
 
         <div id="scanner-page" class="hidden">
             <h3 style="margin-top:0;">สแกนคิวอาร์โค้ด</h3>
+			<p style="font-size: 15px; color: #64748b; margin: -5px 0 20px 0;">**ที่ติดตั้งไว้ ณ บริเวณ อบต.ดงตะงาว**</p>
             <div id="scanner-container"><canvas id="canvas"></canvas></div>
             <p id="scanStatus" style="font-weight:bold; color:var(--primary);">กรุณาสแกนภายใน <span id="timer-text">10</span> วิ</p>
             <button class="btn-main" style="background:#cbd5e1; color:#475569; box-shadow:none;" onclick="location.reload()">ยกเลิก</button>
@@ -183,14 +215,15 @@
         let currentId = "", currentType = "", video = document.createElement("video"), scanning = false, countdown, serverStatus = "";
 
         window.onload = () => {
-            // 1. Splash Screen (หายไวขึ้น)
+            // ปิด Splash Screen (แก้บั๊กค้าง)
             setTimeout(() => { 
                 const splash = document.getElementById('splash-screen');
-                splash.style.opacity = '0'; 
-                setTimeout(()=> splash.classList.add('hidden'), 500);
-            }, 500);
+                if(splash) {
+                    splash.style.opacity = '0'; 
+                    setTimeout(()=> splash.classList.add('hidden'), 800);
+                }
+            }, 1500); // ให้โชว์หน้า Splash สัก 1.5 วิเพื่อความสวยงาม
 
-            // 2. ระบบจำพนักงาน (Check Cache)
             const savedId = localStorage.getItem('abt_user_id');
             const savedName = localStorage.getItem('abt_user_name');
             if (savedId && savedName) {
@@ -199,23 +232,24 @@
                 showMainPageFromCache();
             }
 
-            // 3. นาฬิกาและสถานะ Real-time
             setInterval(() => { 
                 const now = new Date();
                 document.getElementById('displayTime').innerText = now.toLocaleTimeString('th-TH');
-
                 const hours = now.getHours();
                 const mins = now.getMinutes();
                 const statusBox = document.getElementById('displayStatusTime');
 
+                // 🏠 ช่วงเวลาออกงาน (16:30 น. เป็นต้นไป)
                 if (hours >= 17 || (hours == 16 && mins >= 30)) {
                     statusBox.innerText = "สถานะตอนนี้: ถึงเวลาออกงานแล้ว";
                     statusBox.style.color = "var(--success)";
                 } 
+                // 📍 ช่วงเวลาเข้างาน (ก่อน 08:30 น.)
                 else if (hours < 8 || (hours == 8 && mins <= 30)) {
                     statusBox.innerText = "สถานะตอนนี้: มาทำงานปกติ";
                     statusBox.style.color = "var(--success)";
                 } 
+                // ⚠️ ช่วงเวลาสาย หรือช่วงทำงาน
                 else {
                     if(serverStatus) {
                         statusBox.innerText = "สถานะตอนนี้: " + serverStatus;
@@ -238,8 +272,7 @@
             document.getElementById('displayId').innerText = "รหัส: " + localStorage.getItem('abt_user_id');
             document.getElementById('displayName').innerText = localStorage.getItem('abt_user_name');
             document.getElementById('displayPos').innerText = "ตำแหน่ง: " + localStorage.getItem('abt_user_pos');
-            document.getElementById('displayPhone').innerText = "เบอร์โทร: " + localStorage.getItem('abt_user_phone');
-            
+            document.getElementById('displayPhone').innerText = "เบอร์โทร: " + (localStorage.getItem('abt_user_phone') || "-");
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('main-page').classList.remove('hidden');
         }
@@ -248,43 +281,27 @@
             const loginBtn = document.querySelector('.btn-login');
             currentId = document.getElementById('empId').value.trim();
             if(!currentId) return alert("กรุณากรอกรหัสพนักงาน");
-
-            loginBtn.innerText = "⏳ กำลังตรวจสอบ...";
+            loginBtn.innerText = "⏳ กำลังเข้าสู่ระบบ...";
             loginBtn.disabled = true;
-            
             const devId = getDeviceId();
-            
             fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=CHECK_NAME&deviceId=${devId}`)
-            .then(res => res.text())
-            .then(data => {
-                loginBtn.innerText = "เข้าสู่ระบบ";
-                loginBtn.disabled = false;
-
-                if(data.startsWith("DENIED")) {
-                    alert("❌ " + data.split("|")[1]);
-                    return;
-                }
+            .then(res => res.text()).then(data => {
+                loginBtn.innerText = "เข้าสู่ระบบ"; loginBtn.disabled = false;
+                if(data.startsWith("DENIED")) { alert("❌ " + data.split("|")[1]); return; }
                 if(data === "ไม่พบรหัสพนักงาน") return alert(data);
-                
                 const parts = data.split("|");
-                // จำข้อมูลลงเครื่อง
                 localStorage.setItem('abt_user_id', currentId);
                 localStorage.setItem('abt_user_name', parts[0]);
                 localStorage.setItem('abt_user_pos', parts[1]);
                 localStorage.setItem('abt_user_phone', parts[2]);
                 localStorage.setItem('abt_user_status', parts[3]);
-                
                 serverStatus = parts[3];
                 showMainPageFromCache();
-            })
-            .catch(err => {
-                loginBtn.disabled = false;
-                alert("การเชื่อมต่อมีปัญหา กรุณาลองใหม่ครับ");
-            });
+            }).catch(() => { loginBtn.disabled = false; alert("การเชื่อมต่อมีปัญหาครับ"); });
         }
 
         function logout() {
-            if(confirm("ยืนยันออกจากระบบ? (ต้องกรอกรหัสใหม่ครั้งหน้า)")) {
+            if(confirm("ยืนยันออกจากระบบ?")) {
                 localStorage.removeItem('abt_user_id');
                 localStorage.removeItem('abt_user_name');
                 localStorage.removeItem('abt_user_pos');
@@ -301,21 +318,13 @@
             let timeLeft = 10;
             document.getElementById('timer-text').innerText = timeLeft;
             countdown = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer-text').innerText = timeLeft;
+                timeLeft--; document.getElementById('timer-text').innerText = timeLeft;
                 if(timeLeft <= 0) { clearInterval(countdown); alert("หมดเวลาสแกนครับ"); location.reload(); }
             }, 1000);
-
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
-                video.srcObject = stream;
-                video.setAttribute("playsinline", true);
-                video.play();
-                scanning = true;
-                requestAnimationFrame(tick);
-            }).catch(err => {
-                alert("ไม่สามารถเปิดกล้องได้: " + err);
-                location.reload();
-            });
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(stream => {
+                video.srcObject = stream; video.setAttribute("playsinline", true); video.play();
+                scanning = true; requestAnimationFrame(tick);
+            }).catch(() => { alert("เปิดกล้องไม่ได้ครับ"); location.reload(); });
         }
 
         function tick() {
@@ -326,8 +335,7 @@
                 canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
                 const code = jsQR(canvas.getImageData(0, 0, canvasElement.width, canvasElement.height).data, canvasElement.width, canvasElement.height);
                 if (code && code.data === QR_SECRET) {
-                    clearInterval(countdown);
-                    scanning = false;
+                    clearInterval(countdown); scanning = false;
                     video.srcObject.getTracks().forEach(track => track.stop());
                     checkLocationAndSend();
                 }
@@ -336,31 +344,16 @@
         }
 
         function checkLocationAndSend() {
-            document.getElementById('scanStatus').innerText = "📍 ตรวจสอบพิกัด GPS...";
-            
-            const geoOptions = {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            };
-
-            navigator.geolocation.getCurrentPosition(function(pos) {
+            document.getElementById('scanStatus').innerText = "📍 เช็ก GPS...";
+            navigator.geolocation.getCurrentPosition(pos => {
                 const R = 6371e3;
                 const p1 = pos.coords.latitude * Math.PI/180, p2 = targetLat * Math.PI/180;
                 const dp = (targetLat-pos.coords.latitude) * Math.PI/180, dl = (targetLng-pos.coords.longitude) * Math.PI/180;
                 const a = Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
                 const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-                if (dist > maxDistance) {
-                    alert("⚠️ อยู่นอกพื้นที่ อบต. (ห่าง " + Math.round(dist) + " ม.)");
-                    location.reload();
-                } else {
-                    sendData();
-                }
-            }, (err) => { 
-                alert("กรุณาเปิด GPS และรอสักครู่ครับ (" + err.message + ")"); 
-                location.reload(); 
-            }, geoOptions);
+                if (dist > maxDistance) { alert("⚠️ อยู่นอกพื้นที่ อบต. (ห่าง " + Math.round(dist) + " ม.)"); location.reload(); }
+                else { sendData(); }
+            }, (err) => { alert("กรุณาเปิด GPS ครับ"); location.reload(); }, { enableHighAccuracy: true, timeout: 5000 });
         }
 
         function sendData() {
