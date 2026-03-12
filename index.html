@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABT IN/OUT</title>
+    <title>ระบบลงเวลา อบต.ดงตะงาว</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0070f3">
     <link rel="apple-touch-icon" href="icon-512.png">
@@ -162,7 +162,7 @@
             <button class="btn-main btn-out" onclick="startScanner('OUT')"><span>🏠 บันทึกออกงาน</span></button>
             <p style="font-size: 12px; color: #64748b; margin: -5px 0 15px 0;">**ตั้งแต่เวลา 16.30 น. เป็นต้นไป**</p>
 
-            <div class="btn-back" onclick="location.reload()">← ออกจากระบบ</div>
+            <div class="btn-back" onclick="logout()">← ออกจากระบบ</div>
         </div>
 
         <div id="scanner-page" class="hidden">
@@ -178,17 +178,50 @@
         const QR_SECRET = "อบต.ดงตะงาว"; 
         const targetLat = 14.610752; 
         const targetLng = 100.581508; 
-        const maxDistance = 10;
+        const maxDistance = 25; 
 
-        let currentId = "", currentType = "", video = document.createElement("video"), scanning = false, countdown;
+        let currentId = "", currentType = "", video = document.createElement("video"), scanning = false, countdown, serverStatus = "";
 
         window.onload = () => {
+            // 1. Splash Screen (หายไวขึ้น)
             setTimeout(() => { 
-                document.getElementById('splash-screen').style.opacity = '0'; 
-                setTimeout(()=> document.getElementById('splash-screen').classList.add('hidden'), 500);
-            }, 2000);
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0'; 
+                setTimeout(()=> splash.classList.add('hidden'), 500);
+            }, 500);
+
+            // 2. ระบบจำพนักงาน (Check Cache)
+            const savedId = localStorage.getItem('abt_user_id');
+            const savedName = localStorage.getItem('abt_user_name');
+            if (savedId && savedName) {
+                currentId = savedId;
+                serverStatus = localStorage.getItem('abt_user_status') || "ปกติ";
+                showMainPageFromCache();
+            }
+
+            // 3. นาฬิกาและสถานะ Real-time
             setInterval(() => { 
-                document.getElementById('displayTime').innerText = new Date().toLocaleTimeString('th-TH'); 
+                const now = new Date();
+                document.getElementById('displayTime').innerText = now.toLocaleTimeString('th-TH');
+
+                const hours = now.getHours();
+                const mins = now.getMinutes();
+                const statusBox = document.getElementById('displayStatusTime');
+
+                if (hours >= 17 || (hours == 16 && mins >= 30)) {
+                    statusBox.innerText = "สถานะตอนนี้: ถึงเวลาออกงานแล้ว";
+                    statusBox.style.color = "var(--success)";
+                } 
+                else if (hours < 8 || (hours == 8 && mins <= 30)) {
+                    statusBox.innerText = "สถานะตอนนี้: มาทำงานปกติ";
+                    statusBox.style.color = "var(--success)";
+                } 
+                else {
+                    if(serverStatus) {
+                        statusBox.innerText = "สถานะตอนนี้: " + serverStatus;
+                        statusBox.style.color = serverStatus.includes("สาย") ? "var(--danger)" : "var(--success)";
+                    }
+                }
             }, 1000);
         };
 
@@ -201,12 +234,22 @@
             return id;
         }
 
+        function showMainPageFromCache() {
+            document.getElementById('displayId').innerText = "รหัส: " + localStorage.getItem('abt_user_id');
+            document.getElementById('displayName').innerText = localStorage.getItem('abt_user_name');
+            document.getElementById('displayPos').innerText = "ตำแหน่ง: " + localStorage.getItem('abt_user_pos');
+            document.getElementById('displayPhone').innerText = "เบอร์โทร: " + localStorage.getItem('abt_user_phone');
+            
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('main-page').classList.remove('hidden');
+        }
+
         function login() {
             const loginBtn = document.querySelector('.btn-login');
             currentId = document.getElementById('empId').value.trim();
             if(!currentId) return alert("กรุณากรอกรหัสพนักงาน");
 
-            loginBtn.innerText = "⏳ กำลังเข้าสู่ระบบ...";
+            loginBtn.innerText = "⏳ กำลังตรวจสอบ...";
             loginBtn.disabled = true;
             
             const devId = getDeviceId();
@@ -219,37 +262,36 @@
 
                 if(data.startsWith("DENIED")) {
                     alert("❌ " + data.split("|")[1]);
-                    location.reload();
                     return;
                 }
                 if(data === "ไม่พบรหัสพนักงาน") return alert(data);
                 
                 const parts = data.split("|");
-                const statusBox = document.getElementById('displayStatusTime');
-                const statusResult = parts[3]; 
-
-                document.getElementById('displayId').innerText = "รหัส: " + currentId;
-                document.getElementById('displayName').innerText = parts[0];
-                document.getElementById('displayPos').innerText = "ตำแหน่ง: " + (parts[1] || "-");
-                document.getElementById('displayPhone').innerText = "เบอร์โทร: " + (parts[2] || "-");
+                // จำข้อมูลลงเครื่อง
+                localStorage.setItem('abt_user_id', currentId);
+                localStorage.setItem('abt_user_name', parts[0]);
+                localStorage.setItem('abt_user_pos', parts[1]);
+                localStorage.setItem('abt_user_phone', parts[2]);
+                localStorage.setItem('abt_user_status', parts[3]);
                 
-                if (statusBox) {
-                    statusBox.innerText = "สถานะตอนนี้: " + (statusResult || "ปกติ");
-                    if(statusResult && statusResult.includes("สาย")) {
-                        statusBox.style.color = "var(--danger)";
-                    } else {
-                        statusBox.style.color = "var(--success)";
-                    }
-                }
-
-                document.getElementById('login-page').classList.add('hidden');
-                document.getElementById('main-page').classList.remove('hidden');
+                serverStatus = parts[3];
+                showMainPageFromCache();
             })
             .catch(err => {
-                loginBtn.innerText = "เข้าสู่ระบบ";
                 loginBtn.disabled = false;
                 alert("การเชื่อมต่อมีปัญหา กรุณาลองใหม่ครับ");
             });
+        }
+
+        function logout() {
+            if(confirm("ยืนยันออกจากระบบ? (ต้องกรอกรหัสใหม่ครั้งหน้า)")) {
+                localStorage.removeItem('abt_user_id');
+                localStorage.removeItem('abt_user_name');
+                localStorage.removeItem('abt_user_pos');
+                localStorage.removeItem('abt_user_phone');
+                localStorage.removeItem('abt_user_status');
+                location.reload();
+            }
         }
 
         function startScanner(type) {
@@ -295,6 +337,13 @@
 
         function checkLocationAndSend() {
             document.getElementById('scanStatus').innerText = "📍 ตรวจสอบพิกัด GPS...";
+            
+            const geoOptions = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
             navigator.geolocation.getCurrentPosition(function(pos) {
                 const R = 6371e3;
                 const p1 = pos.coords.latitude * Math.PI/180, p2 = targetLat * Math.PI/180;
@@ -308,7 +357,10 @@
                 } else {
                     sendData();
                 }
-            }, () => { alert("กรุณาเปิด GPS ครับ"); location.reload(); }, { enableHighAccuracy: true });
+            }, (err) => { 
+                alert("กรุณาเปิด GPS และรอสักครู่ครับ (" + err.message + ")"); 
+                location.reload(); 
+            }, geoOptions);
         }
 
         function sendData() {
