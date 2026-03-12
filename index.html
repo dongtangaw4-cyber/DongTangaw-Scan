@@ -267,12 +267,18 @@
             }
             return id;
         }
-
-        function showMainPageFromCache() {
+		function showMainPageFromCache() {
             document.getElementById('displayId').innerText = "รหัส: " + localStorage.getItem('abt_user_id');
             document.getElementById('displayName').innerText = localStorage.getItem('abt_user_name');
             document.getElementById('displayPos').innerText = "ตำแหน่ง: " + localStorage.getItem('abt_user_pos');
-            document.getElementById('displayPhone').innerText = "เบอร์โทร: " + (localStorage.getItem('abt_user_phone') || "-");
+            
+            // แก้บรรทัดเบอร์โทร: ถ้าเบอร์ไม่ขึ้นต้นด้วย 0 ให้เติม 0 เข้าไปข้างหน้า
+            let phone = localStorage.getItem('abt_user_phone') || "-";
+            if (phone !== "-" && !phone.startsWith('0')) {
+                phone = '0' + phone;
+            }
+            document.getElementById('displayPhone').innerText = "เบอร์โทร: " + phone;
+            
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('main-page').classList.remove('hidden');
         }
