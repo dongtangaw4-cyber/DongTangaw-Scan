@@ -240,7 +240,7 @@
             document.getElementById('main-page').classList.remove('hidden');
         }
 
-      function login() {
+        function login() {
             const loginBtn = document.querySelector('.btn-login');
             currentId = document.getElementById('empId').value.trim();
             if(!currentId) return alert("กรุณากรอกรหัสพนักงาน");
@@ -264,8 +264,7 @@
                     return;
                 }
 
-                // --- ✨ ส่วนที่เพิ่มใหม่: แสดงสถานะสำเร็จก่อนเข้าหน้าหลัก ---
-                loginBtn.style.background = "linear-gradient(135deg, #27ae60, #2ecc71)"; // เปลี่ยนสีปุ่มเป็นเขียว
+                loginBtn.style.background = "linear-gradient(135deg, #27ae60, #2ecc71)";
                 loginBtn.innerText = "✅ เข้าสู่ระบบสำเร็จ";
 
                 setTimeout(() => {
@@ -278,11 +277,10 @@
                     serverStatus = parts[3];
                     showMainPageFromCache();
                     
-                    // คืนค่าปุ่มเผื่อกรณี Logout ออกมาใหม่
                     loginBtn.style.background = ""; 
                     loginBtn.innerText = "เข้าสู่ระบบ";
                     loginBtn.disabled = false;
-                }, 800); // หน่วงเวลาให้เห็นข้อความสำเร็จ 0.8 วินาที
+                }, 800);
 
             }).catch(() => { 
                 loginBtn.disabled = false; 
@@ -347,7 +345,7 @@
             }, (err) => { alert("กรุณาเปิด GPS ครับ"); location.reload(); }, { enableHighAccuracy: true, timeout: 5000 });
         }
 
-     async function sendData() {
+        async function sendData() {
             let reason = "";
             const now = new Date();
             const hours = now.getHours();
@@ -360,6 +358,8 @@
                     text: "คุณต้องการแจ้งเหตุผลหรือไม่?",
                     icon: 'warning',
                     showCancelButton: true,
+                    confirmButtonColor: '#0070f3',
+                    cancelButtonColor: '#64748b',
                     confirmButtonText: '📝 บอกเหตุผล',
                     cancelButtonText: '❌ ไม่บอก',
                     allowOutsideClick: false
@@ -377,7 +377,6 @@
                     reason = "ไม่บอกเหตุผล";
                 }
             }
-            
             // 🏠 กรณีออกก่อนเวลา (ออกงานก่อน 16.30)
             else if (currentType === "OUT" && (hours < 16 || (hours == 16 && mins < 30))) {
                 const { value: choice } = await Swal.fire({
@@ -385,6 +384,8 @@
                     text: "คุณต้องการแจ้งเหตุผลที่ออกก่อนหรือไม่?",
                     icon: 'question',
                     showCancelButton: true,
+                    confirmButtonColor: '#0070f3',
+                    cancelButtonColor: '#64748b',
                     confirmButtonText: '📝 แจ้งเหตุผล',
                     cancelButtonText: '❌ ไม่แจ้ง',
                     allowOutsideClick: false
@@ -393,7 +394,7 @@
                     const { value: text } = await Swal.fire({
                         title: 'ระบุเหตุผลที่ออกก่อนเวลา',
                         input: 'textarea',
-                        inputPlaceholder: 'เช่น ลากิจช่วงบ่าย, ไปพบหมอ...',
+                        inputPlaceholder: 'พิมพ์เหตุผลที่นี่...',
                         confirmButtonText: 'บันทึก',
                         allowOutsideClick: false
                     });
