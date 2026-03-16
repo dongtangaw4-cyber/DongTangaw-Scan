@@ -30,7 +30,7 @@
         background-color: var(--bg); 
         display: flex; 
         justify-content: center; 
-        align-items: center;     
+        align-items: center;      
         min-height: 100vh; 
         margin: 0; 
         padding: 20px;
@@ -171,13 +171,14 @@
     </div>
 
     <script>
+        // ⚠️ อย่าลืมเช็คว่า URL นี้เป็นตัวล่าสุดที่ได้จาก Apps Script หรือยังนะครับ
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_Gq2Cl2_XU8T4YumgEZiPl4zsdLuyv58PlZeeFWrrXXg0T1ODnSyRBskdEFDu9aok/exec";
         const QR_SECRET = "อบต.ดงตะงาว"; 
         const targetLat = 14.610752; 
         const targetLng = 100.581508; 
         const maxDistance = 25; 
 
-        let currentId = "", currentType = "", video = document.createElement("video"), scanning = false, countdown, serverStatus = "";
+        let currentType = "", video = document.createElement("video"), scanning = false, countdown, serverStatus = "";
 
         window.onload = () => {
             setTimeout(() => { 
@@ -189,9 +190,7 @@
             }, 1500);
 
             const savedId = localStorage.getItem('abt_user_id');
-            const savedName = localStorage.getItem('abt_user_name');
-            if (savedId && savedName) {
-                currentId = savedId;
+            if (savedId) {
                 serverStatus = localStorage.getItem('abt_user_status') || "ปกติ";
                 showMainPageFromCache();
             }
@@ -242,14 +241,14 @@
 
         function login() {
             const loginBtn = document.querySelector('.btn-login');
-            currentId = document.getElementById('empId').value.trim();
-            if(!currentId) return alert("กรุณากรอกรหัสพนักงาน");
+            const inputId = document.getElementById('empId').value.trim();
+            if(!inputId) return alert("กรุณากรอกรหัสพนักงาน");
 
             loginBtn.innerText = "⏳ กำลังเข้าสู่ระบบ...";
             loginBtn.disabled = true;
 
             const devId = getDeviceId();
-            fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=CHECK_NAME&deviceId=${devId}`)
+            fetch(`${WEB_APP_URL}?id=${encodeURIComponent(inputId)}&type=CHECK_NAME&deviceId=${devId}`)
             .then(res => res.text()).then(data => {
                 if(data.startsWith("DENIED")) { 
                     alert("❌ " + data.split("|")[1]); 
@@ -269,7 +268,7 @@
 
                 setTimeout(() => {
                     const parts = data.split("|");
-                    localStorage.setItem('abt_user_id', currentId);
+                    localStorage.setItem('abt_user_id', inputId); // เก็บ ID ที่ Trim แล้ว
                     localStorage.setItem('abt_user_name', parts[0]);
                     localStorage.setItem('abt_user_pos', parts[1]);
                     localStorage.setItem('abt_user_phone', parts[2]);
@@ -351,7 +350,6 @@
             const hours = now.getHours();
             const mins = now.getMinutes();
 
-            // ⚠️ กรณีมาสาย (เข้างานหลัง 08.30)
             if (currentType === "IN" && (hours > 8 || (hours == 8 && mins > 30))) {
                 const { value: choice } = await Swal.fire({
                     title: 'มาทำงานสาย',
@@ -377,7 +375,6 @@
                     reason = "ไม่บอกเหตุผล";
                 }
             }
-            // 🏠 กรณีออกก่อนเวลา (ออกงานก่อน 16.30)
             else if (currentType === "OUT" && (hours < 16 || (hours == 16 && mins < 30))) {
                 const { value: choice } = await Swal.fire({
                     title: 'ออกก่อนเวลา',
@@ -407,7 +404,10 @@
             document.getElementById('scanStatus').innerText = "🔄 กำลังบันทึกข้อมูล...";
             const devId = getDeviceId();
             
-            fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=${currentType}&deviceId=${devId}&reason=${encodeURIComponent(reason)}`)
+            // 💡 จุดสำคัญ: ดึง ID ที่สะอาดจาก localStorage มาส่งเสมอ
+            const savedId = localStorage.getItem('abt_user_id').trim();
+            
+            fetch(`${WEB_APP_URL}?id=${encodeURIComponent(savedId)}&type=${currentType}&deviceId=${devId}&reason=${encodeURIComponent(reason)}`)
             .then(res => res.text()).then(data => { 
                 Swal.fire('สำเร็จ!', data, 'success').then(() => location.reload());
             });
