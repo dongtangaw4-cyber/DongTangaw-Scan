@@ -11,7 +11,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    
     <style>
     :root { 
         --primary: #0070f3; 
@@ -34,7 +36,6 @@
         padding: 20px;
     }
 
-    /* กรอบขาวสมส่วน กระชับแนวตั้ง */
     .container { 
         background: var(--card-bg); 
         padding: 20px 30px; 
@@ -53,21 +54,9 @@
         gap: 0px;
         margin-bottom: 15px;
     }
-    .logo-img { 
-	width: 125px; 
-	height: 105px; 
-	object-fit: contain; 
-	margin-right: -10px; 
-	}
-    
-	.icon-img { 
-	width: 110px; 
-	height: 105px; 
-	object-fit: contain; 
-	margin-left: -10px; 
-	}
+    .logo-img { width: 125px; height: 105px; object-fit: contain; margin-right: -10px; }
+    .icon-img { width: 110px; height: 105px; object-fit: contain; margin-left: -10px; }
 
-    /* หน้า Splash แบบพรีเมียม */
     #splash-screen { 
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
         background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%); 
@@ -86,31 +75,13 @@
     .hidden { display: none !important; }
 
     input { 
-        width: 100%; 
-        padding: 18px; 
-        margin: 20px 0; 
-        border: 2px solid #e1e8f0; 
-        border-radius: 18px; 
-        text-align: center; 
-        
-        /* เปลี่ยนฟอนต์ที่นี่ */
-        font-family: 'Sarabun', sans-serif; 
-        font-size: 20px; 
-        font-weight: 600;
-        
-        color: var(--primary);
-        outline: none; 
-        background: #f8fafc;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); /* ใส่เงาข้างในเบาๆ */
-        transition: all 0.3s ease;
+        width: 100%; padding: 18px; margin: 20px 0; border: 2px solid #e1e8f0; 
+        border-radius: 18px; text-align: center; font-family: 'Sarabun', sans-serif; 
+        font-size: 20px; font-weight: 600; color: var(--primary); outline: none; 
+        background: #f8fafc; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); transition: all 0.3s ease;
     }
 
-    /* เพิ่มเอฟเฟกต์ตอนกดพิมพ์ */
-    input:focus {
-        border-color: var(--primary);
-        background: #ffffff;
-        box-shadow: 0 0 0 4px rgba(0, 112, 243, 0.1);
-    }
+    input:focus { border-color: var(--primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(0, 112, 243, 0.1); }
     
     .btn-main { 
         width: 100%; max-width: 280px; padding: 18px; margin: 10px auto; 
@@ -144,13 +115,9 @@
                 <img src="logo.png" class="logo-img">
                 <img src="logo1.png" class="icon-img">
             </div>
-            <h1 style="color: var(--primary); margin: 0; font-size: 36px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,112,243,0.1);">
-                อบต.ดงตะงาว
-			<h2>ABT IN/OUT</h2>
-            </h1>
-            <p style="color: #64748b; margin-top: 5px; font-size: 18px; letter-spacing: 1px;">
-                ระบบลงเวลาเข้างาน/ออกงาน....
-            </p>
+            <h1 style="color: var(--primary); margin: 0; font-size: 36px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,112,243,0.1);">อบต.ดงตะงาว</h1>
+            <h2 style="color: var(--primary); margin: 10px 0; font-size: 24px;">ABT IN/OUT</h2>
+            <p style="color: #64748b; margin-top: 5px; font-size: 18px; letter-spacing: 1px;">ระบบลงเวลาเข้างาน/ออกงาน....</p>
             <div style="margin-top: 30px;">
                 <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
             </div>
@@ -182,9 +149,7 @@
                 <span id="displayTime" style="display: block; font-size: 34px; font-weight: 800; color: var(--primary);">00:00:00</span>
                 
                 <div style="background: #eef2f7; padding: 10px; border-radius: 12px; margin-top: 15px; border: 1px solid #d1d5db;">
-                    <span id="displayStatusTime" style="display: block; font-size: 15px; color: #334155; font-weight: bold;">
-                        สถานะตอนนี้: กำลังตรวจสอบ...
-                    </span>
+                    <span id="displayStatusTime" style="display: block; font-size: 15px; color: #334155; font-weight: bold;">สถานะตอนนี้: กำลังตรวจสอบ...</span>
                 </div>
             </div>
 
@@ -198,7 +163,7 @@
 
         <div id="scanner-page" class="hidden">
             <h3 style="margin-top:0;">สแกนคิวอาร์โค้ด</h3>
-			<p style="font-size: 15px; color: #64748b; margin: -5px 0 20px 0;">**ที่ติดตั้งไว้ ณ บริเวณ อบต.ดงตะงาว**</p>
+            <p style="font-size: 15px; color: #64748b; margin: -5px 0 20px 0;">**ที่ติดตั้งไว้ ณ บริเวณ อบต.ดงตะงาว**</p>
             <div id="scanner-container"><canvas id="canvas"></canvas></div>
             <p id="scanStatus" style="font-weight:bold; color:var(--primary);">กรุณาสแกนภายใน <span id="timer-text">10</span> วิ</p>
             <button class="btn-main" style="background:#cbd5e1; color:#475569; box-shadow:none;" onclick="location.reload()">ยกเลิก</button>
@@ -215,14 +180,13 @@
         let currentId = "", currentType = "", video = document.createElement("video"), scanning = false, countdown, serverStatus = "";
 
         window.onload = () => {
-            // ปิด Splash Screen (แก้บั๊กค้าง)
             setTimeout(() => { 
                 const splash = document.getElementById('splash-screen');
                 if(splash) {
                     splash.style.opacity = '0'; 
                     setTimeout(()=> splash.classList.add('hidden'), 800);
                 }
-            }, 1500); // ให้โชว์หน้า Splash สัก 1.5 วิเพื่อความสวยงาม
+            }, 1500);
 
             const savedId = localStorage.getItem('abt_user_id');
             const savedName = localStorage.getItem('abt_user_name');
@@ -239,18 +203,13 @@
                 const mins = now.getMinutes();
                 const statusBox = document.getElementById('displayStatusTime');
 
-                // 🏠 ช่วงเวลาออกงาน (16:30 น. เป็นต้นไป)
                 if (hours >= 17 || (hours == 16 && mins >= 30)) {
                     statusBox.innerText = "สถานะตอนนี้: ถึงเวลาออกงานแล้ว";
                     statusBox.style.color = "var(--success)";
-                } 
-                // 📍 ช่วงเวลาเข้างาน (ก่อน 08:30 น.)
-                else if (hours < 8 || (hours == 8 && mins <= 30)) {
+                } else if (hours < 8 || (hours == 8 && mins <= 30)) {
                     statusBox.innerText = "สถานะตอนนี้: มาทำงานปกติ";
                     statusBox.style.color = "var(--success)";
-                } 
-                // ⚠️ ช่วงเวลาสาย หรือช่วงทำงาน
-                else {
+                } else {
                     if(serverStatus) {
                         statusBox.innerText = "สถานะตอนนี้: " + serverStatus;
                         statusBox.style.color = serverStatus.includes("สาย") ? "var(--danger)" : "var(--success)";
@@ -267,43 +226,69 @@
             }
             return id;
         }
-		function showMainPageFromCache() {
+
+        function showMainPageFromCache() {
             document.getElementById('displayId').innerText = "รหัส: " + localStorage.getItem('abt_user_id');
             document.getElementById('displayName').innerText = localStorage.getItem('abt_user_name');
             document.getElementById('displayPos').innerText = "ตำแหน่ง: " + localStorage.getItem('abt_user_pos');
             
-            // แก้บรรทัดเบอร์โทร: ถ้าเบอร์ไม่ขึ้นต้นด้วย 0 ให้เติม 0 เข้าไปข้างหน้า
             let phone = localStorage.getItem('abt_user_phone') || "-";
-            if (phone !== "-" && !phone.startsWith('0')) {
-                phone = '0' + phone;
-            }
+            if (phone !== "-" && !phone.startsWith('0')) phone = '0' + phone;
             document.getElementById('displayPhone').innerText = "เบอร์โทร: " + phone;
             
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('main-page').classList.remove('hidden');
         }
 
-        function login() {
+      function login() {
             const loginBtn = document.querySelector('.btn-login');
             currentId = document.getElementById('empId').value.trim();
             if(!currentId) return alert("กรุณากรอกรหัสพนักงาน");
+
             loginBtn.innerText = "⏳ กำลังเข้าสู่ระบบ...";
             loginBtn.disabled = true;
+
             const devId = getDeviceId();
             fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=CHECK_NAME&deviceId=${devId}`)
             .then(res => res.text()).then(data => {
-                loginBtn.innerText = "เข้าสู่ระบบ"; loginBtn.disabled = false;
-                if(data.startsWith("DENIED")) { alert("❌ " + data.split("|")[1]); return; }
-                if(data === "ไม่พบรหัสพนักงาน") return alert(data);
-                const parts = data.split("|");
-                localStorage.setItem('abt_user_id', currentId);
-                localStorage.setItem('abt_user_name', parts[0]);
-                localStorage.setItem('abt_user_pos', parts[1]);
-                localStorage.setItem('abt_user_phone', parts[2]);
-                localStorage.setItem('abt_user_status', parts[3]);
-                serverStatus = parts[3];
-                showMainPageFromCache();
-            }).catch(() => { loginBtn.disabled = false; alert("การเชื่อมต่อมีปัญหาครับ"); });
+                if(data.startsWith("DENIED")) { 
+                    alert("❌ " + data.split("|")[1]); 
+                    loginBtn.innerText = "เข้าสู่ระบบ"; 
+                    loginBtn.disabled = false;
+                    return; 
+                }
+                if(data === "ไม่พบรหัสพนักงาน") {
+                    alert(data);
+                    loginBtn.innerText = "เข้าสู่ระบบ"; 
+                    loginBtn.disabled = false;
+                    return;
+                }
+
+                // --- ✨ ส่วนที่เพิ่มใหม่: แสดงสถานะสำเร็จก่อนเข้าหน้าหลัก ---
+                loginBtn.style.background = "linear-gradient(135deg, #27ae60, #2ecc71)"; // เปลี่ยนสีปุ่มเป็นเขียว
+                loginBtn.innerText = "✅ เข้าสู่ระบบสำเร็จ";
+
+                setTimeout(() => {
+                    const parts = data.split("|");
+                    localStorage.setItem('abt_user_id', currentId);
+                    localStorage.setItem('abt_user_name', parts[0]);
+                    localStorage.setItem('abt_user_pos', parts[1]);
+                    localStorage.setItem('abt_user_phone', parts[2]);
+                    localStorage.setItem('abt_user_status', parts[3]);
+                    serverStatus = parts[3];
+                    showMainPageFromCache();
+                    
+                    // คืนค่าปุ่มเผื่อกรณี Logout ออกมาใหม่
+                    loginBtn.style.background = ""; 
+                    loginBtn.innerText = "เข้าสู่ระบบ";
+                    loginBtn.disabled = false;
+                }, 800); // หน่วงเวลาให้เห็นข้อความสำเร็จ 0.8 วินาที
+
+            }).catch(() => { 
+                loginBtn.disabled = false; 
+                loginBtn.innerText = "เข้าสู่ระบบ";
+                alert("การเชื่อมต่อมีปัญหาครับ"); 
+            });
         }
 
         function logout() {
@@ -362,11 +347,48 @@
             }, (err) => { alert("กรุณาเปิด GPS ครับ"); location.reload(); }, { enableHighAccuracy: true, timeout: 5000 });
         }
 
-        function sendData() {
+        async function sendData() {
+            let reason = "";
+            const now = new Date();
+            const hours = now.getHours();
+            const mins = now.getMinutes();
+
+            // ⚠️ ระบบถามเหตุผลกรณีมาสาย (เกิน 08:30 น.)
+            if (currentType === "IN" && (hours > 8 || (hours == 8 && mins > 30))) {
+                const { value: choice } = await Swal.fire({
+                    title: 'มาทำงานสาย',
+                    text: "คุณต้องการแจ้งเหตุผลหรือไม่?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0070f3',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: '📝 บอกเหตุผล',
+                    cancelButtonText: '❌ ไม่บอก',
+                    allowOutsideClick: false
+                });
+
+                if (choice) {
+                    const { value: text } = await Swal.fire({
+                        title: 'ระบุเหตุผลที่มาสาย',
+                        input: 'textarea',
+                        inputPlaceholder: 'พิมพ์เหตุผลที่นี่...',
+                        showCancelButton: false,
+                        confirmButtonText: 'บันทึก',
+                        allowOutsideClick: false
+                    });
+                    reason = text || "บอกเหตุผล (ไม่ได้ระบุรายละเอียด)";
+                } else {
+                    reason = "ไม่บอกเหตุผล";
+                }
+            }
+
             document.getElementById('scanStatus').innerText = "🔄 กำลังบันทึกข้อมูล...";
             const devId = getDeviceId();
-            fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=${currentType}&deviceId=${devId}`)
-            .then(res => res.text()).then(data => { alert(data); location.reload(); });
+            
+            fetch(`${WEB_APP_URL}?id=${encodeURIComponent(currentId)}&type=${currentType}&deviceId=${devId}&reason=${encodeURIComponent(reason)}`)
+            .then(res => res.text()).then(data => { 
+                Swal.fire('สำเร็จ!', data, 'success').then(() => location.reload());
+            });
         }
     </script>
 </body>
