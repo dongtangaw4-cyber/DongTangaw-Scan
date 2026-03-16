@@ -347,38 +347,59 @@
             }, (err) => { alert("กรุณาเปิด GPS ครับ"); location.reload(); }, { enableHighAccuracy: true, timeout: 5000 });
         }
 
-        async function sendData() {
+     async function sendData() {
             let reason = "";
             const now = new Date();
             const hours = now.getHours();
             const mins = now.getMinutes();
 
-            // ⚠️ ระบบถามเหตุผลกรณีมาสาย (เกิน 08:30 น.)
+            // ⚠️ กรณีมาสาย (เข้างานหลัง 08.30)
             if (currentType === "IN" && (hours > 8 || (hours == 8 && mins > 30))) {
                 const { value: choice } = await Swal.fire({
                     title: 'มาทำงานสาย',
                     text: "คุณต้องการแจ้งเหตุผลหรือไม่?",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#0070f3',
-                    cancelButtonColor: '#64748b',
                     confirmButtonText: '📝 บอกเหตุผล',
                     cancelButtonText: '❌ ไม่บอก',
                     allowOutsideClick: false
                 });
-
                 if (choice) {
                     const { value: text } = await Swal.fire({
                         title: 'ระบุเหตุผลที่มาสาย',
                         input: 'textarea',
                         inputPlaceholder: 'พิมพ์เหตุผลที่นี่...',
-                        showCancelButton: false,
                         confirmButtonText: 'บันทึก',
                         allowOutsideClick: false
                     });
                     reason = text || "บอกเหตุผล (ไม่ได้ระบุรายละเอียด)";
                 } else {
                     reason = "ไม่บอกเหตุผล";
+                }
+            }
+            
+            // 🏠 กรณีออกก่อนเวลา (ออกงานก่อน 16.30)
+            else if (currentType === "OUT" && (hours < 16 || (hours == 16 && mins < 30))) {
+                const { value: choice } = await Swal.fire({
+                    title: 'ออกก่อนเวลา',
+                    text: "คุณต้องการแจ้งเหตุผลที่ออกก่อนหรือไม่?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: '📝 แจ้งเหตุผล',
+                    cancelButtonText: '❌ ไม่แจ้ง',
+                    allowOutsideClick: false
+                });
+                if (choice) {
+                    const { value: text } = await Swal.fire({
+                        title: 'ระบุเหตุผลที่ออกก่อนเวลา',
+                        input: 'textarea',
+                        inputPlaceholder: 'เช่น ลากิจช่วงบ่าย, ไปพบหมอ...',
+                        confirmButtonText: 'บันทึก',
+                        allowOutsideClick: false
+                    });
+                    reason = text || "ออกก่อนเวลา (ไม่ได้ระบุรายละเอียด)";
+                } else {
+                    reason = "ออกก่อนเวลา (ไม่แจ้งเหตุผล)";
                 }
             }
 
